@@ -42,3 +42,9 @@
     height: 30px; /* Height of the footer */
     background: #336666;
 }
+
+.vertical-center {
+    min-height: 100%;  /* Fallback for browsers do NOT support vh unit */
+    display: flex;
+    align-items: center;
+}
