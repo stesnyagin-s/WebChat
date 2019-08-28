@@ -1,0 +1,153 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3" lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <title>WebChat</title>
+</head>
+<body>
+<div id="header">
+    <meta th:name="_csrf" th:content="${_csrf.token}"/>
+    <meta th:name="_csrf_header" th:content="${_csrf.headerName}"/>
+</div>
+<div class="row mt-4 justify-content-end">
+    <div class="col1"><h4 sec:authentication="name"></h4></div>
+    <div class="col2 ml-4">
+        <form method="POST" id="logout" action="javascript:void(null);" onsubmit="logout()">
+            <button type="submit" class="btn btn-primary">Logout</button>
+        </form>
+    </div>
+    <div class="col3" style="width: 9%"></div>
+</div>
+
+<div class="row my-4 mx-4 " style="height:65%">
+    <div id="history" class="col-sm-9 border mr-4 overflow-auto" style="background-color: #f5f6fa; height:100%">
+        <div class="overflow-auto"></div>
+    </div>
+    <div id="usersOnline" class="col-sm-2 border overflow-auto" style="background-color: #f5f6fa; height:100%"></div>
+</div>
+<form class="form-inline" method="POST" id="msgform" action="javascript:void(null);" onsubmit="say()">
+    <input name="msg" class="form-control mx-4" type="text" style="width:70%;background-color: #f5f6fa">
+    <button type="submit" class="btn btn-primary">Send</button>
+</form>
+
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script>
+    $(function () {
+        var token = $("meta[name='_csrf']").attr("content");
+        var header = $("meta[name='_csrf_header']").attr("content");
+        $(document).ajaxSend(function (e, xhr, options) {
+            xhr.setRequestHeader(header, token);
+        });
+    });
+
+
+    var host = "localhost";
+    var port = 8080;
+
+
+    function loadHistory() {
+        var settings = {
+            "crossDomain": true,
+            "url": "http://" + host + ":" + port + "/chat/chat",
+            "method": "GET"
+        };
+
+        $.ajax(settings).done(function (response) {
+            $("#history").html(response.replace(/\n/g, "<br />"));
+            $("#history").scrollTop($("#history")[0].scrollHeight);
+        }).fail(function (jqXHR, textStatus) {
+            console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+        });
+    }
+
+    function logout() {
+        var settings = {
+            "method": "POST",
+            "crossDomain": true,
+            "url": "http://" + host + ":" + port + "/logout",
+            "success": function (result) {
+                location.href = "/login"
+            }
+        };
+
+        $.ajax(settings).done(function (response) {
+        }).fail(function (jqXHR, textStatus) {
+            alert(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+            console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+        });
+    }
+
+    function say() {
+        var msg = $('#msgform').serialize();
+
+
+        var settings = {
+            "method": "POST",
+            "crossDomain": true,
+            "url": "http://" + host + ":" + port + "/chat/say",
+            "data": msg
+        };
+
+        $.ajax(settings).done(function (response) {
+            $('#msgform').trigger("reset");
+            loadHistory();
+        }).fail(function (jqXHR, textStatus) {
+            alert(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+            console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+        });
+    }
+
+    function login() {
+        var name = $('#nameform').serialize();
+
+        var settings = {
+            "method": "POST",
+            "crossDomain": true,
+            "url": "http://" + host + ":" + port + "/chat/login",
+            "data": name
+        };
+        $.ajax(settings).done(function (response) {
+            loadHistory();
+        }).fail(function (jqXHR, textStatus) {
+            alert(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+            console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+        });
+    }
+
+    function online() {
+
+        var settings = {
+            "crossDomain": true,
+            "url": "http://" + host + ":" + port + "/chat/online",
+            "method": "GET"
+        };
+
+        $.ajax(settings).done(function (response) {
+            $("#usersOnline").html(response.replace(/\n/g, "<br />"));
+            $("#usersonline").scrollTop($("#usersOnline")[0].scrollHeight);
+        }).fail(function (jqXHR, textStatus) {
+            console.log(jqXHR.status + " " + jqXHR.statusText + ". " + jqXHR.responseText);
+        });
+    }
+
+    loadHistory();
+    online();
+    setInterval(loadHistory, 10000);
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+</html>
+
