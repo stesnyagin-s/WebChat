@@ -1,7 +1,7 @@
 package com.lrn.chat;
 
 import com.lrn.chat.service.Messages;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.lrn.chat.service.UsersOnline;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -14,10 +14,13 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class SessionEndedListener implements ApplicationListener<SessionDestroyedEvent> {
-    @Autowired
-    private Messages msg;
-    @Autowired
-    private UsersOnline users;
+    private final Messages msg;
+    private final UsersOnline users;
+
+    public SessionEndedListener(Messages msg, UsersOnline users) {
+        this.msg = msg;
+        this.users = users;
+    }
 
     @Override
     public void onApplicationEvent(SessionDestroyedEvent event) {

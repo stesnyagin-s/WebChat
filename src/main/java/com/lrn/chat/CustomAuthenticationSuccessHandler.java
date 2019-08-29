@@ -1,7 +1,7 @@
 package com.lrn.chat;
 
 import com.lrn.chat.service.Messages;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.lrn.chat.service.UsersOnline;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -15,14 +15,16 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 @Component
 public class CustomAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    @Autowired
-    private Messages msg;
-    @Autowired
-    private UsersOnline users;
+    private final Messages msg;
+    private final UsersOnline users;
+
+    public CustomAuthenticationSuccessHandler(Messages msg, UsersOnline users) {
+        this.msg = msg;
+        this.users = users;
+    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {

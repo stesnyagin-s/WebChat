@@ -1,6 +1,6 @@
 <!doctype html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity3" lang="en">
+      lang="en">
 <head>
     <!-- Required meta tags -->
     <meta charset="utf-8">
@@ -53,8 +53,8 @@
             xhr.setRequestHeader(header, token);
         });
     });
-    var host = "localhost";
-    var port = 8080;
+    var host = window.location.hostname;
+    var port = "";
 
     function register() {
         var data = $('#regform').serialize();

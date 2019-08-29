@@ -1,11 +1,9 @@
-package com.lrn.chat;
+package com.lrn.chat.service;
 
 import org.springframework.stereotype.Repository;
 
 import java.util.Map;
-import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 @Repository
 public class UsersOnline {
